@@ -14,19 +14,14 @@ REM ЧЕКАЕМ GIT ==--
 if not exist "%~dp0Git" (
     curl -LO https://github.com/git-for-windows/git/releases/download/v2.42.0.windows.2/MinGit-2.42.0.2-64-bit.zip && powershell.exe -nologo -noprofile -command "Expand-Archive -Path '.\*.zip' -DestinationPath '%~dp0Git'"
     del MinGit-2.42.0.2-64-bit.zip
-    goto check
-) else (
-    goto check   
 )
 
 REM Удаляем старые сборки ==--
 
-:check
-
-if exist .gitignore goto check2
+if exist .gitignore goto check
 goto del
 
-:check2
+:check
 dir /ad .git > nul
 if %errorlevel% equ 0 goto update
 
@@ -49,11 +44,14 @@ REM ОБНОВЛЯЕМ МОДЫ ==--
 
 :update 
 
-git\cmd\git.exe init
-git config --global init.defaultBranch main
-git\cmd\git.exe remote add origin https://github.com/UberMorgott/VMP.git
-git\cmd\git.exe pull origin main
-git\cmd\git.exe checkout .
+SET GIT_EXECUTABLE=git\cmd\git.exe
+SET REPO_URL=https://github.com/UberMorgott/VMP.git
+
+"%GIT_EXECUTABLE%" init
+::"%GIT_EXECUTABLE%" config --global init.defaultBranch main
+"%GIT_EXECUTABLE%" remote add origin "%REPO_URL%"
+"%GIT_EXECUTABLE%" pull origin main
+"%GIT_EXECUTABLE%" checkout .
 
 
 REM ИГРАЕМ ==--
