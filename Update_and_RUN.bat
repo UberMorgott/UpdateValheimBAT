@@ -67,7 +67,7 @@ wget --user=ModMan --password=4dyEtavmjFHZf5W -q --show-progress -r -N -l inf --
 if %errorlevel% equ 0 (
     echo Моды успешно скачаны или обновлены.
     set "downloaded=1"
-    goto :end
+    goto :launch_game
 ) else (
     echo Ошибка при загрузке модов. Повторная попытка...
 )
@@ -81,7 +81,7 @@ if %downloaded% equ 0 (
     echo Подключиться к серверу обновлений никак не удаётся, обратись к Morgott с этой ошибкой.
     echo Нажмите любую клавишу для выхода...
     pause >nul
-    exit
+    goto :launch_game
 )
 
 ::::Удаляем мусор::::
@@ -102,3 +102,10 @@ for /f "delims=" %%i in ('dir /b "%path_to_delete%"') do (
 )
 del /f /q "%keep_files%"
 del /f /q "%~dp0curl_log.txt"
+
+::::Запуск игры::::
+
+echo Запускаем игру с высоким приоритетом
+:launch_game
+%1
+exit /b
