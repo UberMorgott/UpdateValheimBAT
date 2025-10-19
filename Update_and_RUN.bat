@@ -107,5 +107,5 @@ del /f /q "%~dp0curl_log.txt"
 
 echo Запускаем игру с высоким приоритетом
 :launch_game
-%1
-exit /b
+valheim
+
