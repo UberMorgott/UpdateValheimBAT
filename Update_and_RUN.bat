@@ -106,4 +106,4 @@ del /f /q "%~dp0curl_log.txt"
 ::::Запуск игры::::
 
 echo Запускаем игру с высоким приоритетом
-start "Valheim" /high "valheim.exe" -windows-mode exclusive
+%1
