@@ -1,59 +1,108 @@
 @echo off
 chcp 65001 > nul
 
-REM ЧЕКАЕМ Valheim.exe ==--
+::::Wget::::
 
-if not exist "%~dp0Valheim.exe" (
-    echo Перенесите данный скрипт в папку, где есть Valheim.exe.
+set "url=https://eternallybored.org/misc/wget/1.21.1/64/wget.exe"
+set "url_backup=https://eternallybored.org/misc/wget/1.21.4/64/wget.exe"
+set "attempts=3"
+set /a count=0
+set "downloaded=0"
+
+where wget >nul 2>nul
+if %errorlevel% neq 0 goto :download_wget
+goto :mods
+
+:download_wget
+echo wget не найден. Пытаемся скачать wget...
+
+:download_attempt
+set /a count+=1
+echo Попытка %count% из %attempts%...
+powershell -Command "try { Invoke-WebRequest -Uri '%url%' -OutFile '%~dp0wget.exe' -ErrorAction Stop } catch { exit 1 }"
+if %errorlevel% equ 0 (
+    echo wget успешно скачан.
+    set "downloaded=1"
+    goto :mods
+) else (
+    echo Не удалось скачать wget с основной ссылки.
+)
+
+if %count% lss %attempts% (
+    goto :download_attempt
+)
+
+echo Пробуем скачать другую версию wget...
+powershell -Command "try { Invoke-WebRequest -Uri '%url_backup%' -OutFile '%~dp0wget.exe' -ErrorAction Stop } catch { exit 1 }"
+if %errorlevel% equ 0 (
+    echo wget успешно скачан с запасной ссылки.
+    set "downloaded=1"
+    goto :mods
+) else (
+    echo Не удалось скачать wget с запасной ссылки.
+    goto :manual_download
+)
+
+:manual_download
+	echo 	Не удалось скачать wget автоматически.
+	echo 	Пожалуйста, зайдите на https://eternallybored.org/misc/wget/ и скачайте wget.exe самостоятельно.
+	echo 	Сохраните его в ту же папку, где находится этот скрипт.
+	echo 	Для выхода нажмите любую клавишу.
+    pause >nul
+    exit
+
+::::Обновляем моды::::
+
+:mods
+echo Скачиваем или обновляем моды.
+cd /d "%~dp0"
+set /a count=0
+set "downloaded=0"
+
+:download_attemptm
+set /a count+=1
+echo Попытка скачивания модов %count% из %attempts%...
+
+wget --user=ModMan --password=splurgeola -q --show-progress -r -N -l inf --no-host-directories --no-parent --cut-dirs=1 ftp://morgott.keenetic.pro/Share/valheim/
+if %errorlevel% equ 0 (
+    echo Моды успешно скачаны или обновлены.
+    set "downloaded=1"
+    goto :end
+) else (
+    echo Ошибка при загрузке модов. Повторная попытка...
+)
+
+if %count% lss %attempts% (
+    timeout /t 5 >nul
+    goto :download_attemptm
+)
+
+if %downloaded% equ 0 (
+    echo Подключиться к серверу обновлений никак не удаётся, обратись к Morgott с этой ошибкой.
+    echo Нажмите любую клавишу для выхода...
     pause >nul
     exit
 )
 
-REM ЧЕКАЕМ GIT ==--
+::::Удаляем мусор::::
 
-if not exist "%~dp0Git" (
-    curl -LO https://github.com/git-for-windows/git/releases/download/v2.42.0.windows.2/MinGit-2.42.0.2-64-bit.zip && powershell.exe -nologo -noprofile -command "Expand-Archive -Path '.\*.zip' -DestinationPath '%~dp0Git'"
-    del MinGit-2.42.0.2-64-bit.zip
-)
+curl --user ModMan:splurgeola --list-only ftp://morgott.keenetic.pro/Valheim/BepInEx/plugins/ > ftp_files.txt
+set "keep_files=%~dp0ftp_files.txt"
+set "path_to_delete=%~dp0BepInEx\plugins"
 
-REM Удаляем старые сборки ==--
-
-if exist .gitignore goto check
-goto del
-
-:check
-dir /ad .git > nul
-if %errorlevel% equ 0 goto update
-
-:del
-set "keep_files=MonoBleedingEdge valheim_Data SteamOverlay64.dll steam_appid.txt unins000.dat UnityCrashHandler64.exe UnityPlayer.dll valheim.exe %~nx0 Git"
-
-for /f "delims=" %%i in ('dir /b /a:d') do (
-    echo "%keep_files%" | findstr /i "\<%%i\>" >nul || (
-        rmdir /s /q "%%i" >nul
+for /f "delims=" %%i in ('dir /b /a:d "%path_to_delete%"') do (
+    findstr /i "\<%%i\>" "%keep_files%" >nul || (
+        rmdir /s /q "%path_to_delete%\%%i" >nul
     )
 )
-
-for /f "delims=" %%i in ('dir /b') do (
-    echo "%keep_files%" | findstr /i "\<%%i\>" >nul || (   
-        del /f /q "%%i" >nul
+for /f "delims=" %%i in ('dir /b "%path_to_delete%"') do (
+    findstr /i "\<%%i\>" "%keep_files%" >nul || (   
+        del /f /q "%path_to_delete%\%%i" >nul
     )
 )
+del /f /q "%keep_files%"
 
-REM ОБНОВЛЯЕМ МОДЫ ==--
+::::Запуск игры::::
 
-:update 
-
-SET GIT_EXECUTABLE=git\cmd\git.exe
-SET REPO_URL=https://github.com/UberMorgott/VMP.git
-
-"%GIT_EXECUTABLE%" init
-::"%GIT_EXECUTABLE%" config --global init.defaultBranch main
-"%GIT_EXECUTABLE%" remote add origin "%REPO_URL%"
-"%GIT_EXECUTABLE%" pull origin main
-"%GIT_EXECUTABLE%" checkout .
-
-
-REM ИГРАЕМ ==--
-
-start valheim
+echo Запускаем игру с высоким приоритетом
+start "Valheim" /high "valheim.exe" -windows-mode exclusive
