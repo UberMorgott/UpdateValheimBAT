@@ -86,7 +86,7 @@ if %downloaded% equ 0 (
 
 ::::Удаляем мусор::::
 
-curl --user ModMan:splurgeola --list-only ftp://morgott.keenetic.pro/BepInEx/plugins/ > ftp_files.txt
+curl --user ModMan:4dyEtavmjFHZf5W --list-only ftp://morgott.keenetic.pro/BepInEx/plugins/ > ftp_files.txt
 set "keep_files=%~dp0ftp_files.txt"
 set "path_to_delete=%~dp0BepInEx\plugins"
 
@@ -111,6 +111,7 @@ reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers
 
 echo Запускаем игру с высоким приоритетом
 start "Valheim" /high "valheim.exe" -windows-mode exclusive
+
 
 
 
