@@ -102,8 +102,3 @@ for /f "delims=" %%i in ('dir /b "%path_to_delete%"') do (
 )
 del /f /q "%keep_files%"
 del /f /q "%~dp0curl_log.txt"
-
-::::Запуск игры::::
-
-echo Запускаем игру с высоким приоритетом
-%1
