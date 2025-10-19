@@ -63,7 +63,7 @@ set "downloaded=0"
 set /a count+=1
 echo Попытка скачивания модов %count% из %attempts%...
 
-wget --user=ModMan --password=splurgeola -q --show-progress -r -N -l inf --no-host-directories --no-parent --cut-dirs=1 ftp://morgott.keenetic.pro/Share/valheim/
+wget --user=ModMan --password=splurgeola -q --show-progress -r -N -l inf --no-host-directories --no-parent --cut-dirs=1 ftp://morgott.keenetic.pro/valheim/
 if %errorlevel% equ 0 (
     echo Моды успешно скачаны или обновлены.
     set "downloaded=1"
