@@ -63,7 +63,7 @@ set "downloaded=0"
 set /a count+=1
 echo Попытка скачивания модов %count% из %attempts%...
 
-wget --user=ModMan --password=splurgeola -q --show-progress -r -N -l inf --no-host-directories --no-parent --cut-dirs=1 ftp://morgott.keenetic.pro/
+wget --user=ModMan --password=4dyEtavmjFHZf5W -q --show-progress -r -N -l inf --no-host-directories --no-parent --cut-dirs=1 ftp://morgott.keenetic.pro/
 if %errorlevel% equ 0 (
     echo Моды успешно скачаны или обновлены.
     set "downloaded=1"
@@ -111,6 +111,7 @@ reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers
 
 echo Запускаем игру с высоким приоритетом
 start "Valheim" /high "valheim.exe" -windows-mode exclusive
+
 
 
 
