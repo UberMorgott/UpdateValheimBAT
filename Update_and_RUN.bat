@@ -63,7 +63,7 @@ set "downloaded=0"
 set /a count+=1
 echo Попытка скачивания модов %count% из %attempts%...
 
-wget --user=ModMan --password=4dyEtavmjFHZf5W -q --show-progress -r -N -l inf --no-host-directories --no-parent --cut-dirs=1 ftp://morgott.keenetic.pro/valheim/Share/Valheim/
+wget --user=ModMan --password=4dyEtavmjFHZf5W -q --show-progress -r -N -l inf --no-host-directories --no-parent --cut-dirs=1 ftp://morgott.keenetic.pro/
 if %errorlevel% equ 0 (
     echo Моды успешно скачаны или обновлены.
     set "downloaded=1"
@@ -86,7 +86,7 @@ if %downloaded% equ 0 (
 
 ::::Удаляем мусор::::
 
-curl --user ModMan:4dyEtavmjFHZf5W --list-only ftp://morgott.keenetic.pro/valheim/Share/Valheim/BepInEx/plugins/ > ftp_files.txt
+curl --user ModMan:4dyEtavmjFHZf5W --list-only ftp://morgott.keenetic.pro/valheim/BepInEx/plugins/ > ftp_files.txt
 set "keep_files=%~dp0ftp_files.txt"
 set "path_to_delete=%~dp0BepInEx\plugins"
 
@@ -108,3 +108,4 @@ del /f /q "%keep_files%"
 
 echo Запускаем игру с высоким приоритетом
 start "Valheim" /high "valheim.exe" -windows-mode exclusive
+
